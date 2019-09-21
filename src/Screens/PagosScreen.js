@@ -8,7 +8,7 @@ var BUTTONS = [
   { text: "Preescolar",icon: "ios-contacts",iconColor: "#FFD417",url:"https://www.ciaigandhi.com/REGLAMENTO-BASICO.pdf", index:1 },
   { text: "Primaria",icon: "ios-contacts",iconColor: "##002d62",url:"https://www.ciaigandhi.com/REGLAMENTO-BASICO.pdf", index:2 },
   { text: "Secundaria",icon: "ios-contacts",iconColor: "#FFD417",url:"https://www.ciaigandhi.com/REGLAMENTO-SECUNDARIA.pdf", index:3 },
-  { text: "Cancel", index:4}
+  { text: "Cancelar", index:4}
 ];
 var CANCEL_INDEX = 4;
 export default class PagosScreen extends React.Component {
@@ -114,7 +114,7 @@ export default class PagosScreen extends React.Component {
                 </View>
                 <Text style={{ fontSize: 18, fontWeight: "bold" }}>Transferencia</Text>
                 <Text style={{ textAlign: "justify" }}>Indispensable agregar la referencia y envíe el comprobantepara aplicar su pago en tiempo y emitir su factura al correo:</Text>
-                <Text style={{ color: "blue" }}>colegioindiragandhiprimaria@gmail.com</Text>
+                <Text onPress={() => {Linking.openURL("mailto:colegioindiragandhiprimaria@gmail.com?subject=Colegiatura+(MES)+(NOMBRE)+(NIVEL)")}} style={{ color: "blue" }}>colegioindiragandhiprimaria@gmail.com</Text>
                 <View style={{ alignItems: "center", flexGrow: 1 }}>
                   <Image source={require("../resources/ejemplo.png")} style={{ height: 60, resizeMode: "contain" }} />
                 </View>

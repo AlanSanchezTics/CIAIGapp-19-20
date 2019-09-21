@@ -82,7 +82,7 @@ export default class PerfilScreen extends React.Component {
       .then((responseJson) => {
         if (responseJson === true) {
           AsyncStorage.clear();
-          AsyncStorage.setItem("update","update");
+          //AsyncStorage.setItem("update","update");
           AsyncStorage.setItem("TokenID", global.token);
           this.props.navigation.navigate('AuthLoading');
         }
@@ -170,9 +170,8 @@ export default class PerfilScreen extends React.Component {
       return (
         <View style={styles.container}>
           <View style={styles.welcomeContainer} >
-            <Text style={{ fontWeight: "bold", fontSize: 20, textAlign: "center", color: "#000" }}>Colegio Indira Gandhi</Text>
-            <Text style={{ textAlign: "center", color: "#000", fontStyle: "italic" }}>"Un buen principio para un futuro brillante"</Text>
-            <Text style={{ color: "#D0D0D0", textAlign: "center" }}>Ciclo escolar 2019-2020</Text>
+            <Text style={{ fontWeight: "bold", fontSize: 20, textAlign: "center", color: "#000" }}>Control Integral del Alumno</Text>
+            <Text style={{ textAlign: "center", color: "#000", fontStyle: "italic" }}>Obteniendo datos...</Text>
             <View style={{ alignItems: "center" }}>
               <ContentLoader
                 height={130}

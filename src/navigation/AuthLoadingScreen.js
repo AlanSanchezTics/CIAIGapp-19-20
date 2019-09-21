@@ -22,14 +22,23 @@ export default class AuthLoadingScreen extends Component {
         const update = await AsyncStorage.getItem("update");
         //Quitar en futuras versiones
         if(!update){
-            Alert.alert(
-                "Actualización",
-                "Se ha cerrado la sesión en su dispositivo para reestablecer los datos de la App. Pero no se preocupe, a continuación le daremos su clave de acceso para entrar nuevamente."+
-                "Recuerde que su usuario comienza con la serie 2018 o 2019."+
-                " Clave: "+idAlumno,
-                [{text: 'Entiendo', onPress: () => {AsyncStorage.clear();}}]
-                );
-            AsyncStorage.setItem("update","update");
+            if(!idUsuario || !idAlumno){
+                AsyncStorage.clear();
+                AsyncStorage.setItem("update","update");
+                AsyncStorage.setItem("TokenID", global.token);
+            }else{
+                Alert.alert(
+                    "Actualización",
+                    "Se ha cerrado la sesión en su dispositivo para reestablecer los datos de la App. Pero no se preocupe, a continuación le daremos su clave de acceso para entrar nuevamente."+
+                    "Recuerde que su usuario comienza con la serie 2018 o 2019."+
+                    " Clave: "+idAlumno,
+                    [{text: 'Entiendo', onPress: () => {
+                        AsyncStorage.clear();
+                        AsyncStorage.setItem("update","update");
+                        AsyncStorage.setItem("TokenID", global.token);
+                    }}]
+                    );
+            }
             this.props.navigation.navigate('Auth');
         }else{
             this.props.navigation.navigate(idUsuario ? 'App' : 'Auth');
