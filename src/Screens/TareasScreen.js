@@ -1,10 +1,19 @@
-import React from 'react';
-import {createStackNavigator,createMaterialTopTabNavigator} from 'react-navigation';
+import React, { Component } from 'react'
+import {createStackNavigator,createMaterialTopTabNavigator, createAppContainer, NavigationActions} from 'react-navigation';
 import Espanol from './TareasContent/tareasEsp';
 import Ingles from './TareasContent/TareasEn';
 import Computacion  from './TareasContent/TareasCom';
 import Musica from './TareasContent/TareasMus';
 import Deportes from './TareasContent/TareasEF';
+import Asignaturas from './TareasContent/TareasAsigs';
+
+const AsigStack = createStackNavigator({
+  Espanol:Asignaturas
+});
+AsigStack.navigationOptions ={
+  tabBarLabel:"Asignaturas"
+};
+
 
 const espStack = createStackNavigator({
   Espanol:Espanol
@@ -67,5 +76,51 @@ const TareasStack = createMaterialTopTabNavigator({
     }
   },
 });
-
-export default TareasStack;
+const tareasNavigator = createStackNavigator({
+  Secundaria:{
+    screen:AsigStack,
+    navigationOptions: {
+        header:null
+    }
+},
+  Primaria:{
+    screen:TareasStack,
+    navigationOptions: {
+        header:null
+    }
+},
+Preescolar:{
+  screen:TareasStack,
+  navigationOptions: {
+      header:null
+  }
+},
+prekinder:{
+  screen:TareasStack,
+  navigationOptions: {
+      header:null
+  }
+}
+});
+const NivelContainer = createAppContainer(tareasNavigator);
+export default class TareasScreen extends Component {
+  componentDidMount(){
+    this.setNivel();
+  }
+  setNivel() {
+    // call navigate for AppNavigator here:
+    this.navigator &&
+      this.navigator.dispatch(
+        NavigationActions.navigate({ routeName: global.nivel})
+      );
+  }
+  render(){
+    return(
+      <NivelContainer 
+      ref={nav => {
+          this.navigator = nav;
+        }}
+      />
+    );  
+  }
+}

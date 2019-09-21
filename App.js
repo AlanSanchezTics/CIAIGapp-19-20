@@ -5,10 +5,19 @@ import AppNavigator from './src/navigation/TabBarNavigation.js';
 import Moment from 'moment';
 import 'moment/locale/es';
 import HTMLView from 'react-native-htmlview';
-import { Card, CardItem, Body, Text, Root } from 'native-base';
+import { Card, CardItem, Body, Text, Root, Left, Thumbnail } from 'native-base';
 import URL from './src/navigation/ServerURL.js';
 import OneSignal from "react-native-onesignal"; // Import package from node modules
 global.token = "";
+function renderNode(node, index, siblings, parent, defaultRenderer) {
+  if (node.name == 'p') {
+      return (
+          <Text key={index} style={{fontSize:13, paddingVertical:5, lineHeight:17}}>
+              {defaultRenderer(node.children, parent)}
+          </Text>
+      )
+  }
+}
 export default class App extends Component {
   state = {
     modalNotificationVisible: false,
@@ -19,7 +28,8 @@ export default class App extends Component {
   };
   constructor(props) {
     super(props);
-    OneSignal.init("MY_ID_ONESIGNAL");
+    OneSignal.init("ONE_SIGNAL_API");
+    OneSignal.inFocusDisplaying(2);
   }
   componentWillMount() {
     OneSignal.addEventListener('opened', this.onOpened);
@@ -39,6 +49,7 @@ export default class App extends Component {
   onIds(device) {
     global.token = device.userId;
     AsyncStorage.setItem("TokenID", global.token);
+    
   }
 
   _onOpened(visible) {
@@ -57,17 +68,21 @@ export default class App extends Component {
           visible={this.state.modalNotificationVisible}>
           <View style={{ flex: 1, flexDirection: "column", backgroundColor: "#3A79F7", padding: 5, paddingBottom: 0 }}>
             <ScrollView>
-              <Card>
+              <Card style={{marginTop:30}}>
                 <CardItem>
-                  <Body>
-                    <Text style={{ fontSize: 24 }}>{this.state.rowData.Title}</Text>
-                    <Text note>{Moment(this.state.rowData.FechaI).format('LL')}</Text>
-                  </Body>
+                  <Left>
+                    <Thumbnail source={require("./src/resources/default.png")}/>
+                    <Body>
+                      <Text style={{ fontSize: 18 }}>{this.state.rowData.Title}</Text>
+                      <Text note>{Moment(this.state.rowData.FechaI).format('LL')}</Text>
+                    </Body>
+                  </Left>
                 </CardItem>
                 <CardItem>
                   <Body>
                     <HTMLView
                       value={this.state.rowData.body}
+                      renderNode={renderNode}
                       stylesheet={{b:{color:"#000", fontWeight: "bold"}, u:{textDecorationLine: 'underline'}}}
                     />
                     {

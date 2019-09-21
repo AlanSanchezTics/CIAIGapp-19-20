@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, Image, TouchableOpacity, RefreshControl, Modal } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import { Text, List, Card, CardItem, Body } from 'native-base';
+import { Text, List, Card, CardItem, Body, Left, Thumbnail } from 'native-base';
 import Moment from 'moment';
 import 'moment/locale/es';
 import HTMLView from 'react-native-htmlview';
@@ -10,7 +10,15 @@ import URL from '../../navigation/ServerURL';
 import Svg,{Circle,Rect} from "react-native-svg";
 import ContentLoader from 'rn-content-loader';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-
+function renderNode(node, index, siblings, parent, defaultRenderer) {
+    if (node.name == 'p') {
+        return (
+            <Text key={index} style={{fontSize:13, paddingVertical:5, lineHeight:17}}>
+                {defaultRenderer(node.children, parent)}
+            </Text>
+        )
+    }
+}
 export default class AvisosGrupales extends Component {
     static navigationOptions = {
         header: null
@@ -89,15 +97,19 @@ export default class AvisosGrupales extends Component {
                         renderRow={(rowData) =>
                             <Card>
                                 <CardItem>
-                                    <Body>
-                                        <Text style={{ fontSize: 24 }}>{rowData.titulo}</Text>
-                                        <Text note>{Moment(rowData.fechaEm).format('LL')}</Text>
-                                    </Body>
+                                    <Left>
+                                        <Thumbnail source={require("../../resources/default.png")} />
+                                        <Body>
+                                            <Text style={{ fontSize:18 }}>{rowData.titulo}</Text>
+                                            <Text note>{Moment(rowData.fechaEm).format('LL')}</Text>
+                                        </Body>
+                                    </Left>
                                 </CardItem>
                                 <CardItem>
                                     <Body>
                                     <HTMLView 
                                             value={rowData.descripcion}
+                                            renderNode={renderNode}
                                             stylesheet={{b:{color:"#000", fontWeight: "bold"}, u:{textDecorationLine: 'underline'}}}
                                         />
                                         {

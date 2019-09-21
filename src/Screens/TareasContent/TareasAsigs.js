@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Image, TouchableOpacity, RefreshControl, Modal } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity, RefreshControl,Modal } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import { Text, List, Card, CardItem, Body, Left } from 'native-base';
+import { Text, List, Card, CardItem, Body,Thumbnail, Left } from 'native-base';
 import Moment from 'moment';
 import 'moment/locale/es';
 import HTMLView from 'react-native-htmlview';
@@ -11,6 +11,7 @@ import Svg,{Circle,Rect} from "react-native-svg";
 import ContentLoader from 'rn-content-loader';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import UserAvatar from 'react-native-user-avatar';
+
 function renderNode(node, index, siblings, parent, defaultRenderer) {
     if (node.name == 'p') {
         return (
@@ -20,7 +21,7 @@ function renderNode(node, index, siblings, parent, defaultRenderer) {
         )
     }
 }
-export default class TareasEF extends Component {
+export default class TareasEsp extends Component {
     static navigationOptions = {
         header: null
     }
@@ -47,7 +48,7 @@ export default class TareasEF extends Component {
             },
             body: JSON.stringify({
                 grupo: idGrupo,
-                tipo: "ef"
+                tipo: "as"
             })
         })
         .then((response) => response.json())
@@ -101,10 +102,11 @@ export default class TareasEF extends Component {
                             <Card>
                                 <CardItem>
                                     <Left>
-                                        <UserAvatar size="48" name={rowData.titulo} />
+                                        <UserAvatar size="48" name={rowData.materia} />
                                         <Body>
                                             <Text style={{ fontSize: 18 }}>{rowData.titulo}</Text>
                                             <Text note>{Moment(rowData.fechaCreacion).format('LL')}</Text>
+                                            <Text note style={{color:"green"}}>Asignatura: {rowData.materia}</Text>
                                         </Body>
                                     </Left>
                                 </CardItem>
@@ -113,7 +115,7 @@ export default class TareasEF extends Component {
                                         <HTMLView 
                                             value={rowData.descripcion}
                                             renderNode={renderNode}
-                                            stylesheet={{b:{color:"#000", fontWeight: "bold"}, u:{textDecorationLine: 'underline'}}}
+                                            stylesheet={{p:{marginVertical:0, paddingVertical:0},b:{color:"#000", fontWeight: "bold"}, u:{textDecorationLine: 'underline'}}}
                                         />
                                         {
                                             (rowData.imagen !=null && rowData.imagen !="") ?
@@ -124,7 +126,7 @@ export default class TareasEF extends Component {
                                             />
                                             </TouchableOpacity>
                                             :
-                                            <Text></Text>
+                                            <View></View>
                                         }
                                     </Body>
                                 </CardItem>
@@ -148,7 +150,6 @@ export default class TareasEF extends Component {
                             enableSwipeDown={true}
                             index={0}
                             imageUrls={this.state.image}
-                            enablePreload={true}
                         />
                         </View>
                     </Modal>

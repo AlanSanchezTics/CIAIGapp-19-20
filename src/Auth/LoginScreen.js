@@ -46,11 +46,12 @@ class LoginScreen extends Component {
             AsyncStorage.setItem('idGrupo', responseJson.idGrupo);
             AsyncStorage.setItem('idUsuario',responseJson.idUsuario);
             AsyncStorage.setItem('nGrupo', responseJson.grupo);
+            //console.warn("IDAlumno: "+responseJson.idAlumno+", IDGrupo:"+responseJson.idGrupo+", IDUsuario: "+responseJson.idUsuario+", Grupo: "+responseJson.grupo);
             this.props.navigation.navigate('App');
           }
         })
         .catch((error) =>{
-          Alert.alert("Error de conexion","ocurrio un problema con tu conexion a internet. Intenta mas tarde");
+          Alert.alert("Error de conexión","ocurrio un problema con tu conexión a internet. Intenta mas tarde");
           console.error(error);
           this.setState({
             isLoading:false

@@ -1,9 +1,8 @@
 import React from 'react';
-import { StyleSheet, View, ScrollView, Image, TouchableOpacity, AlertIOS, Platform } from 'react-native';
+import { StyleSheet, View, ScrollView, Image, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import { Card, CardItem, Body, Text } from 'native-base';
+import { Card, CardItem, Body, Text, Toast } from 'native-base';
 import URL from '../navigation/ServerURL.js';
-import Dialog from 'react-native-dialog-input';
 import Svg,{Circle,Rect} from "react-native-svg";
 import ContentLoader from 'rn-content-loader';
 
@@ -14,7 +13,7 @@ export default class PerfilScreen extends React.Component {
     return {
       title: "Mi perfil",
       headerLeft: <Image source={require("../resources/toolbarlogo.png")} style={{ marginLeft: 10 }} />,
-      headerRight: <TouchableOpacity onPress={navigation.getParam('logOut')}><Text style={{ color: "#fff", margin: 10 }}>cerrar sesión</Text></TouchableOpacity>,
+      headerRight: <TouchableOpacity onPress={navigation.getParam('logOut')}><Text style={{ color: "#fff", margin: 10 }}>Salir</Text></TouchableOpacity>,
       headerTintColor: '#fff',
       headerStyle: {
         backgroundColor: "#002d62",
@@ -27,13 +26,13 @@ export default class PerfilScreen extends React.Component {
       dataSource: [],
       refreshing: true,
       lostConnection: false,
-      DialogTel: false,
-      DialogEmail: false
     }
   }
   getDataApi = async () => {
     let id = await AsyncStorage.getItem("idAlumno");
     nGrupo = await AsyncStorage.getItem("nGrupo");
+    global.token = await AsyncStorage.getItem("TokenID");
+    
     fetch(`${URL}/App/getDatosApp.php`, {
       method: 'post',
       header: {
@@ -45,76 +44,16 @@ export default class PerfilScreen extends React.Component {
     })
       .then((response) => response.json())
       .then((responseJson) => {
-        if (Platform.OS === "ios") {
-          if (responseJson.telefono == "" || responseJson.telefono == null) {
-            if (Platform.OS == "ios") {
-              AlertIOS.prompt(
-                'Ingresa tu Telefono',
-                'Como parte de la integración de los padres de familia con el colegio, te invitamos a proporcionar tu numero telefonico para tener una mejor comunicación',
-                [
-                  {
-                    text: 'Registrar',
-                    onPress: (telefono) => {
-                      fetch(`${URL}/App/insertAdicionalData.php?sql=UPDATE tbl_alumnos SET TEL="${telefono}" WHERE ID_ALUMNO=${id}`, {
-                        method: 'get',
-                        header: {
-                          "Accept": "application/json",
-                          "content-type": "application/json",
-                        }
-                      });
-                      this._onRefresh();
-                    },
-                  },
-                ],
-                'plain-text',
-              );
-            }
-          } else if (responseJson.correo == "" || responseJson.correo == null) {
-            if (Platform.OS == "ios") {
-              AlertIOS.prompt(
-                'Ingresa tu Correo',
-                'Como parte de la integración de los padres de familia con el colegio, te invitamos a proporcionar tu correo electronico para tener una mejor comunicación',
-                [
-                  {
-                    text: 'Registrar',
-                    onPress: (correo) => {
-                      fetch(`${URL}/App/insertAdicionalData.php?sql=UPDATE tbl_alumnos SET EMAIL="${correo}" WHERE ID_ALUMNO=${id}`, {
-                        method: 'get',
-                        header: {
-                          "Accept": "application/json",
-                          "content-type": "application/json",
-                        }
-                      });
-                      this._onRefresh();
-                    },
-                  },
-                ],
-                'plain-text',
-              );
-            }
-          }
-        } else {
-          if (responseJson.telefono == "" || responseJson.telefono == null) {
-            idAlumno=id;
-            this.setState({DialogTel:true});
-          } else if (responseJson.correo == "" || responseJson.correo == null) {
-            idAlumno = id;
-            this.setState({ DialogEmail: true });
-          }
-        }
-        if (responseJson.nivel == 1) {
-          responseJson.nivel = "Preescolar";
-        } else if (responseJson.nivel == 2) {
-          responseJson.nivel = "Primaria";
-        }
         this.setState({
           refreshing: false,
+          idAlumno: id,
           dataSource: responseJson
         });
+        global.nivel = responseJson.nivel;
       })
       .catch((err) => {
         this.setState({ refreshing: false, lostConnection: true })
-      })
+      });
   }
   componentDidMount() {
     this.getDataApi();
@@ -125,7 +64,6 @@ export default class PerfilScreen extends React.Component {
     this.getDataApi();
   }
   logOut = async () => {
-    let idAlumno = await AsyncStorage.getItem("idAlumno");
     let idUsuario = await AsyncStorage.getItem("idUsuario");
     global.token = await AsyncStorage.getItem("TokenID");
     await AsyncStorage.removeItem("idUsuario");
@@ -144,6 +82,8 @@ export default class PerfilScreen extends React.Component {
       .then((responseJson) => {
         if (responseJson === true) {
           AsyncStorage.clear();
+          AsyncStorage.setItem("update","update");
+          AsyncStorage.setItem("TokenID", global.token);
           this.props.navigation.navigate('AuthLoading');
         }
       })
@@ -155,61 +95,33 @@ export default class PerfilScreen extends React.Component {
     if (!this.state.refreshing && !this.state.lostConnection) {
       return (
         <View style={styles.container}>
-        <Dialog
-                isDialogVisible={this.state.DialogTel}
-                title={"Ingresa tu Telefono"}
-                message={"Como parte de la integración de los padres de familia con el colegio, te invitamos a proporcionar tu numero telefonico para tener una mejor comunicación"}
-                hintInput={"Telefono"}
-                submitText={"Registrar"}
-                cancelText={"Cancelar"}
-                textInputProps={{keyboardType:"default"}}
-                submitInput={(telefono) => {
-                  fetch(`${URL}/App/insertAdicionalData.php?sql=UPDATE tbl_alumnos SET TEL="${telefono}" WHERE ID_ALUMNO=${idAlumno}`, {
-                    method: 'get',
-                    header: {
-                      "Accept": "application/json",
-                      "content-type": "application/json",
-                    }
-                  });
-                  this.setState({DialogTel:false});
-                  this._onRefresh();
-                }}
-                closeDialog={() => { 
-                  this.setState({DialogTel:false});
-                  this._onRefresh(); }}
-              />
-              <Dialog
-              isDialogVisible={this.state.DialogEmail}
-              title={"Ingresa tu Correo"}
-              message={"Como parte de la integración de los padres de familia con el colegio, te invitamos a proporcionar tu correo electronico para tener una mejor comunicación"}
-              hintInput={"Correo Electronico"}
-              submitText={"Registrar"}
-              cancelText={"Cancelar"}
-              textInputProps={{keyboardType:"email-address"}}
-              submitInput = {(correo) => {
-                fetch(`${URL}/App/insertAdicionalData.php?sql=UPDATE tbl_alumnos SET EMAIL="${correo}" WHERE ID_ALUMNO=${idAlumno}`, {
-                  method: 'get',
-                  header: {
-                    "Accept": "application/json",
-                    "content-type": "application/json",
-                  }
-                });
-                this.setState({DialogEmail:false});
-                this._onRefresh();
-              }}
-              closeDialog={() => { 
-                this.setState({DialogEmail:false});
-                this._onRefresh(); }}
-              />
           <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
             <View style={styles.welcomeContainer} >
-              <Text style={{ fontWeight: "bold", fontSize: 20, textAlign: "center", color: "#000" }}>Colegio Indira Gandhi</Text>
-              <Text style={{ textAlign: "center", color: "#000", fontStyle: "italic" }}>"Un buen principio para un futuro brillante"</Text>
-              <Text style={{ color: "#D0D0D0", textAlign: "center" }}>Ciclo escolar 2019-2020</Text>
+              <Text style={{ fontWeight: "bold", fontSize: 20, textAlign: "center", color: "#000" }}>Datos del Alumno</Text>
+              <Text style={{ color: "#000", textAlign: "center" }}>Ciclo escolar 2019-2020</Text>
               <View style={{ alignItems: "center" }}>
-                <Image borderRadius={50} source={require("../resources/default.png")} style={{ marginVertical: 10, width: 100, height: 100 }} />
+                <Image borderRadius={50} source={{uri: this.state.dataSource.foto}} style={{ marginVertical: 10, width: 100, height: 100 }} />
                 <Text style={{ fontWeight: "bold", fontSize: 20, textAlign: "center", color: "#000" }}>{this.state.dataSource.name} {this.state.dataSource.A_paterno} {this.state.dataSource.A_materno}</Text>
               </View>
+              <Card style={{ alignItems: "center" }}>
+                <CardItem header>
+                  <Text style={{ fontWeight: "bold" }}>ID</Text>
+                </CardItem>
+                <CardItem>
+                  <Body style={{ alignItems: "center" }}>
+                    <Text onPress={
+                      () =>{
+                        Toast.show({
+                          text:"Tambien usuario de acceso",
+                          buttonText:"Entendido",
+                          position:"bottom",
+                          type: "success"
+                        })
+                      }
+                    }>{this.state.idAlumno}</Text>
+                  </Body>
+                </CardItem>
+              </Card>
               <Card style={{ alignItems: "center" }}>
                 <CardItem header>
                   <Text style={{ fontWeight: "bold" }}>Grupo</Text>
